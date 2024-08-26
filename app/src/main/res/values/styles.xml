@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.alpha_vet" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- 테마 속성 정의 -->
+    </style>
+</resources>
