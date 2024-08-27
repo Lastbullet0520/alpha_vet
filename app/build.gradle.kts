@@ -47,13 +47,24 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+
 }
 
 dependencies {
     // 프로젝트 복사 과정 나중에 삭제할 수도 있음
     implementation("com.google.android.material:material:1.10.0") // 최신 버전을 사용하세요
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core-ktx:1.10.1")
+
+    implementation("com.kakao.sdk:v2-all:2.20.3") // 전체 모듈 설치, 2.11.0 버전부터 지원
+    implementation("com.kakao.sdk:v2-user:2.20.3") // 카카오 로그인 API 모듈
+    implementation("com.kakao.sdk:v2-share:2.20.3") // 카카오톡 공유 API 모듈
+    implementation("com.kakao.sdk:v2-talk:2.20.3") // 카카오톡 채널, 카카오톡 소셜, 카카오톡 메시지 API 모듈
+    implementation("com.kakao.sdk:v2-friend:2.20.3") // 피커 API 모듈
+    implementation("com.kakao.sdk:v2-navi:2.20.3") // 카카오내비 API 모듈
+    implementation("com.kakao.sdk:v2-cert:2.20.3") // 카카오톡 인증 서비스 API 모듈
+
+
     // 프로젝트 복사 과정
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

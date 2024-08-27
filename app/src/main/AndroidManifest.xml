@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 마이크 사용 권한 선언 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- 인터넷 권한 추가 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -26,7 +31,6 @@
         </activity>
 
     </application>
-    <!-- 마이크 사용 권한 선언 -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
 
 </manifest>
