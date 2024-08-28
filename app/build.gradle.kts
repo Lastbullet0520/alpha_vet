@@ -63,6 +63,13 @@ dependencies {
     implementation("com.kakao.sdk:v2-friend:2.20.3") // 피커 API 모듈
     implementation("com.kakao.sdk:v2-navi:2.20.3") // 카카오내비 API 모듈
     implementation("com.kakao.sdk:v2-cert:2.20.3") // 카카오톡 인증 서비스 API 모듈
+    implementation("com.kakao.maps.open:android:2.11.9") // 카카오 지도 API 모듈
+
+    // Coil의 기본 의존성
+    implementation("io.coil-kt:coil:2.4.0")
+    // 만약 Jetpack Compose를 사용하고 있다면 추가적으로 아래 의존성을 추가하세요.
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
 
 
     // 프로젝트 복사 과정
