@@ -1,5 +1,6 @@
 package com.example.alpha_vet
 
+import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -19,66 +20,67 @@ import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
+import com.kakao.vectormap.label.LabelTextBuilder
 
+data class Location(val name: String, val latitude: Double, val longitude: Double)
 
 @Composable
 fun KakaoMapScreen(
     modifier: Modifier = Modifier,
-    locationX: Double, // 서버에서 제공하는 X 값 (경도)
-    locationY: Double, // 서버에서 제공하는 Y 값 (위도)
+    locations: List<Location> // 여러 위치 정보를 리스트로 받음
 ) {
-    // 확인을 위해 기본 텍스트 추가
     Text(text = "Loading Kakao Map...")
-    val context = LocalContext.current
-    val mapView = remember { MapView(context) } // KakaoMapView를 기억하여 재사용할 수 있도록 설정
+    val localContext = LocalContext.current
+    val mapView = remember { MapView(localContext) }
 
     AndroidView(
-        modifier = modifier.fillMaxSize().height(200.dp), // AndroidView의 높이 임의 설정
-        factory = { context ->
+        modifier = modifier
+            .fillMaxSize()
+            .height(200.dp),
+        factory = { _ ->
             mapView.apply {
                 mapView.start(
                     object : MapLifeCycleCallback() {
-                        // 지도 생명 주기 콜백: 지도가 파괴될 때 호출
                         override fun onMapDestroy() {
-                            // 필자가 직접 만든 Toast생성 함수
+                            Log.d("KakaoMap", "Map destroyed")
                         }
 
-                        // 지도 생명 주기 콜백: 지도 로딩 중 에러가 발생했을 때 호출
                         override fun onMapError(exception: Exception?) {
-                            // 필자가 직접 만든 Toast생성 함수
+                            Log.e("KakaoMap", "Map error: ${exception?.message}")
                         }
                     },
                     object : KakaoMapReadyCallback() {
-                        // KakaoMap이 준비되었을 때 호출
                         override fun onMapReady(kakaoMap: KakaoMap) {
-                            // 카메라를 (locationY, locationX) 위치로 이동시키는 업데이트 생성
-                            Log.d("KakaoMap", "Map is ready") // 지도 로드 확인
-                            val cameraUpdate = CameraUpdateFactory.newCenterPosition(LatLng.from(locationY, locationX))
+                            Log.d("KakaoMap", "Map is ready")
 
-                            // 지도에 표시할 라벨의 스타일 설정
-                            val style = kakaoMap.labelManager?.addLabelStyles(LabelStyles.from(
-                                LabelStyle.from(R.drawable.ic_launcher_foreground)))
+                            // 모든 위치의 중심점 계산
+                            val centerLat = locations.map { it.latitude }.average()
+                            val centerLon = locations.map { it.longitude }.average()
+                            val center = LatLng.from(centerLat, centerLon)
 
-                            // 라벨 옵션을 설정하고 위치와 스타일을 적용
-                            val options = LabelOptions.from(LatLng.from(locationY, locationX)).setStyles(style)
-
-                            // KakaoMap의 labelManager에서 레이어를 가져옴
-                            val layer = kakaoMap.labelManager?.layer
-
-                            // 카메라를 지정된 위치로 이동
+                            // 중심점으로 카메라 이동
+                            val cameraUpdate = CameraUpdateFactory.newCenterPosition(center)
                             kakaoMap.moveCamera(cameraUpdate)
 
-                            // 지도에 라벨을 추가
-                            layer?.addLabel(options)
-                        }
+                            // 줌 레벨 설정 (1에서 19 사이의 값, 19가 가장 확대된 상태)
+                            kakaoMap.moveCamera(CameraUpdateFactory.zoomTo(11))
 
-                        override fun getPosition(): LatLng {
-                            // 현재 위치를 반환
-                            return LatLng.from(locationY, locationX)
+                            // LabelStyle 생성
+                            val labelStyle = LabelStyle.from(R.drawable.transparentmarkerresize).setTextStyles(32, Color.BLACK, 1, Color.GRAY)
+                            val labelStyles = kakaoMap.labelManager!!.addLabelStyles(LabelStyles.from(labelStyle))
+
+                            // 각 위치에 마커 추가
+                            locations.forEach { location ->
+                                val options = LabelOptions.from(LatLng.from(location.latitude, location.longitude))
+                                    .setStyles(labelStyles)
+                                    .setTexts(LabelTextBuilder().setTexts(location.name))
+                                kakaoMap.labelManager?.layer?.addLabel(options)
+                            }
                         }
-                    },
+                    }
                 )
             }
-        },
+        }
     )
 }
+
