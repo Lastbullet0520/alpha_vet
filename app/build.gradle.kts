@@ -69,9 +69,12 @@ dependencies {
     implementation("io.coil-kt:coil:2.4.0")
     // 만약 Jetpack Compose를 사용하고 있다면 추가적으로 아래 의존성을 추가하세요.
     implementation("io.coil-kt:coil-compose:2.4.0")
-
-
-
+    // OkHttp: HTTP 클라이언트 라이브러리, API 호출을 위해 사용
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    // Kotlin Coroutines Core: 코루틴을 사용하여 비동기 프로그래밍을 지원하는 라이브러리
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    // Kotlin Coroutines Android: Android에서 코루틴을 사용할 수 있게 해주는 라이브러리 (메인 스레드에서의 안전한 비동기 작업 지원)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
     // 프로젝트 복사 과정
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
