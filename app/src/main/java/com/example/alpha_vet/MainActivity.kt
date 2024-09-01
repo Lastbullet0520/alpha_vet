@@ -57,8 +57,7 @@ fun MyApp(darkModeViewModel: DarkModeViewModel) {
 @Composable
 fun AppContent(darkModeViewModel: DarkModeViewModel) {
     val navController = rememberNavController()
-    val petProfileViewModel = remember { PetProfileViewModel() }
-//    val petProfileViewModel: PetProfileViewModel = viewModel()
+    val petProfileViewModel: PetProfileViewModel = viewModel()
 
 
     Scaffold(
@@ -72,7 +71,10 @@ fun AppContent(darkModeViewModel: DarkModeViewModel) {
                 navController = navController,
                 startDestination = "entryScreen"
             ) {
-                composable("mainScreen") { MainScreen(navController, darkModeViewModel) }
+                //buttomNavigation 화면전환 추가
+                composable(Screen.Home.route) { MainScreen(navController, darkModeViewModel) }
+                composable(Screen.Search.route) { SearchScreen() }
+                composable(Screen.Profile.route) { ProfileScreen2() }
                 composable("entryScreen") { EntryScreen(navController) }
                 composable("doglistScreen") { DoglistScreen(navController, darkModeViewModel) }
                 composable("catlistScreen") { CatlistScreen(navController, darkModeViewModel) }
@@ -84,53 +86,10 @@ fun AppContent(darkModeViewModel: DarkModeViewModel) {
                 composable("profileScreen") {
                     ProfileScreen(navController, petProfileViewModel, darkModeViewModel)
                 }
-                //buttomNavigation 화면전환 추가
-                composable(Screen.Home.route) { HomeScreen() }
-                composable(Screen.Search.route) { SearchScreen() }
-                composable(Screen.Profile.route) { ProfileScreen2() }
+
             }
         }
     }
 }
 
-//class DarkModeViewModel : ViewModel() {
-//    private val _isDarkMode = MutableStateFlow(false)
-//    val isDarkMode: StateFlow<Boolean> = _isDarkMode
-//
-//    fun toggleDarkMode() {
-//        _isDarkMode.value = !_isDarkMode.value
-//    }
-//
-//    fun setDarkMode(enabled: Boolean) {
-//        _isDarkMode.value = enabled
-//    }
-//}
 
-//@Composable
-//fun MyAppTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(),
-//    content: @Composable () -> Unit
-//) {
-//    val colors = if (darkTheme) {
-//        darkColorScheme(
-//            primary = Color(0xFFBB86FC),
-//            onPrimary = Color.Black,
-//            background = Color.Black,
-//            surface = Color.DarkGray,
-//            onSurface = Color.White
-//        )
-//    } else {
-//        lightColorScheme(
-//            primary = Color(0xFF6200EE),
-//            onPrimary = Color.White,
-//            background = Color.White,
-//            surface = Color.LightGray,
-//            onSurface = Color.Black
-//        )
-//    }
-//
-//    MaterialTheme(
-//        colorScheme = colors,
-//        content = content
-//    )
-//}

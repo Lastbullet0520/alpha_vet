@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.alpha_vet.state.Screen
 
 @Composable
 fun EntryScreen(navController: NavController) {
@@ -24,8 +25,8 @@ fun EntryScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         delay(2000)
-        navController.navigate("MainScreen") {
-            popUpTo("EntryScreen") { inclusive = true }
+        navController.navigate(Screen.Home.route) {
+            popUpTo("entryScreen") { inclusive = true }
         }
     }
 

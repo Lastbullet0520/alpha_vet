@@ -38,21 +38,23 @@ import com.example.alpha_vet.model.DarkModeViewModel
 import com.example.alpha_vet.model.PetProfileViewModel
 
 
-//class PetProfileViewModel : ViewModel() {
-//    var species by mutableStateOf("")
-//    var name by mutableStateOf("")
-//    var age by mutableStateOf("")
-//    var gender by mutableStateOf("")
-//    var photoUri by mutableStateOf<String?>(null)
-//}
-
 @Composable
-fun ProfileScreen(navController: NavController, petProfileViewModel: PetProfileViewModel, darkModeViewModel: DarkModeViewModel) {
+fun ProfileScreen(
+    navController: NavController,
+    petProfileViewModel: PetProfileViewModel,
+    darkModeViewModel: DarkModeViewModel,
+) {
     var species by remember { mutableStateOf(TextFieldValue(petProfileViewModel.species)) }
     var name by remember { mutableStateOf(TextFieldValue(petProfileViewModel.name)) }
     var age by remember { mutableStateOf(TextFieldValue(petProfileViewModel.age)) }
     var gender by remember { mutableStateOf(TextFieldValue(petProfileViewModel.gender)) }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(petProfileViewModel.photoUri?.let { Uri.parse(it) }) }
+    var selectedImageUri by remember {
+        mutableStateOf<Uri?>(petProfileViewModel.photoUri?.let {
+            Uri.parse(
+                it
+            )
+        })
+    }
 
     val context = LocalContext.current
 
