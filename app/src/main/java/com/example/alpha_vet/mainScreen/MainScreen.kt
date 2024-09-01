@@ -36,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -47,7 +48,7 @@ import com.example.alpha_vet.model.DarkModeViewModel
 @Composable
 // 상단 "AI가 추천해주는..." , 하단
 fun MainScreen(navController: NavController,darkModeViewModel: DarkModeViewModel) {
-    MyApp(darkModeViewModel = darkModeViewModel)
+    MyApp(darkModeViewModel)
     Scaffold(
         topBar = {
             Column {
@@ -195,3 +196,4 @@ fun PetCard(
         }
     }
 }
+

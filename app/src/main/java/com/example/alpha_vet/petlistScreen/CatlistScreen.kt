@@ -98,8 +98,8 @@ fun CatCard(
                 .padding(16.dp)
         ) {
             catItem?.picture1?.let {
-                val imageBitmap = decodeBase64ToBitmap(it)
-                Image(bitmap = imageBitmap.asImageBitmap(), contentDescription = "Cat Image")
+                val imageBitmap = decodeBase64ToImageBitmap(it)
+                Image(bitmap = imageBitmap, contentDescription = "Cat Image")
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(

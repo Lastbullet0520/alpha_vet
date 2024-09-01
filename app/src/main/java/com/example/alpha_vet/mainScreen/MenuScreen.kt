@@ -42,9 +42,15 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.alpha_vet.model.DarkModeViewModel
 import com.example.alpha_vet.R
 import com.example.alpha_vet.model.PetProfileViewModel
+import com.example.alpha_vet.state.Screen
 
 @Composable
-fun MenuScreen(navController: NavController, petProfileViewModel: PetProfileViewModel, darkModeViewModel: DarkModeViewModel) {
+fun MenuScreen(
+    navController: NavController,
+    petProfile: PetProfileViewModel,
+    darkModeViewModel: DarkModeViewModel,
+) {  // 새로 추가된 버튼에 사용
+    var isPetProfileVisible by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,7 +76,7 @@ fun MenuScreen(navController: NavController, petProfileViewModel: PetProfileView
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Display the pet's image if available, else default image
-                petProfileViewModel.photoUri?.let {
+                petProfile.photoUri?.let {
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -110,12 +116,12 @@ fun MenuScreen(navController: NavController, petProfileViewModel: PetProfileView
                     horizontalArrangement = Arrangement.spacedBy(16.dp) // Increase spacing between text elements
                 ) {
                     Text(
-                        text = petProfileViewModel.name,
+                        text = petProfile.name,
                         color = Color.White,
                         fontSize = 16.sp // Set font size to be the same for both texts
                     )
                     Text(
-                        text = "${petProfileViewModel.species}, ${petProfileViewModel.age}, ${petProfileViewModel.gender}",
+                        text = "${petProfile.species}, ${petProfile.age}, ${petProfile.gender}",
                         color = Color.White,
                         fontSize = 16.sp // Set font size to be the same for both texts
                     )
@@ -123,7 +129,8 @@ fun MenuScreen(navController: NavController, petProfileViewModel: PetProfileView
             }
 
             IconButton(
-                onClick = { navController.navigate("MainScreen") },
+                // 이부분은 수정이 필요
+                onClick = { navController.navigate(Screen.Home.route) },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(16.dp)
@@ -153,9 +160,56 @@ fun MenuScreen(navController: NavController, petProfileViewModel: PetProfileView
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "쿠폰함", color = Color.Gray)
             }
+
+            // 나의 펫 버튼
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                TextButton(
+                    onClick = { isPetProfileVisible = !isPetProfileVisible },
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text(text = "나의 펫", color = Color.Gray)
+                }
+            }
         }
 
+
         Divider(thickness = 1.dp, color = Color.LightGray)
+        // "나의 펫 버튼을 클릭했을 때 프로필 정보 표시"
+        // "나의 펫" 버튼을 클릭했을 때 프로필 정보 표시
+        if (isPetProfileVisible) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                petProfile.photoUri?.let {
+                    Image(
+                        painter = rememberAsyncImagePainter(Uri.parse(it)),
+                        contentDescription = "Pet Profile Image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
+                } ?: run {
+                    Image(
+                        painter = painterResource(id = R.drawable.dog),
+                        contentDescription = "Default Pet Image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = "이름: ${petProfile.name}", fontSize = 18.sp, color = Color.Black)
+                Text(text = "종: ${petProfile.species}", fontSize = 18.sp, color = Color.Black)
+                Text(text = "나이: ${petProfile.age}", fontSize = 18.sp, color = Color.Black)
+                Text(text = "성별: ${petProfile.gender}", fontSize = 18.sp, color = Color.Black)
+            }
+        }
 
         MenuItem(title = "펫보험", navController = navController)
         MenuItem(title = "고객센터", navController = navController)

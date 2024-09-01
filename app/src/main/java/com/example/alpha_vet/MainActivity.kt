@@ -76,7 +76,7 @@ fun AppContent(darkModeViewModel: DarkModeViewModel) {
                 composable(Screen.Search.route) { SearchScreen() }
                 composable(Screen.Profile.route) { ProfileScreen2() }
                 composable("entryScreen") { EntryScreen(navController) }
-                composable("doglistScreen") { DoglistScreen(navController, darkModeViewModel) }
+                composable("doglistScreen") { DoglistScreen(navController, darkModeViewModel, petProfileViewModel) }
                 composable("catlistScreen") { CatlistScreen(navController, darkModeViewModel) }
                 composable("menuScreen") {
                     MenuScreen(navController, petProfileViewModel, darkModeViewModel)
