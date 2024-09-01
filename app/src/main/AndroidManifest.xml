@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.alpha_vet"
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- 마이크 사용 권한 선언 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- 인터넷 권한 추가 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 네트워크 상태 권한 추가 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- 위치 권한 추가 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -18,7 +25,11 @@
         android:theme="@style/Theme.Alpha_vet"
         tools:targetApi="31">
 
-    <activity
+        <!-- Kakao 지도 API 키 추가 -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="45acaf256ea22896ae5df77e36cebc2f" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -29,7 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 
