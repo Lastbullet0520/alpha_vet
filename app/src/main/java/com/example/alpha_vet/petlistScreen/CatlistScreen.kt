@@ -5,36 +5,48 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.alpha_vet.model.DarkModeViewModel
 import com.example.alpha_vet.MyApp
+import com.example.alpha_vet.R
 import com.example.alpha_vet.model.CatItem
-
+import com.example.alpha_vet.model.PetProfile
+import com.example.alpha_vet.model.PetProfileViewModel
 
 @Composable
-fun CatlistScreen(navController: NavController, darkModeViewModel: DarkModeViewModel, catItems: List<CatItem> = emptyList()) {
-    MyApp(darkModeViewModel = darkModeViewModel)
+fun CatlistScreen(
+    navController: NavController,
+    darkModeViewModel: DarkModeViewModel,
+    petProfileViewModel: PetProfileViewModel,
+    catItems: List<CatItem> = emptyList()
+) {
+    MyApp(darkModeViewModel = darkModeViewModel, petProfileViewModel)
+
+    val petProfiles by petProfileViewModel.petProfiles.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -64,10 +76,16 @@ fun CatlistScreen(navController: NavController, darkModeViewModel: DarkModeViewM
 
                 items(cardCount) { index ->
                     if (catItems.isEmpty()) {
-                        EmptyCard()  // 빈 카드
+                        EmptyCard()
                     } else {
                         CatCard(navController = navController, catItem = catItems[index])
                     }
+                }
+
+                // 추가된 부분: 저장된 프로필을 리스트에 추가
+                items(petProfiles.size) { index ->
+                    val profile = petProfiles[index]
+                    CatCard(navController = navController, profile = profile)
                 }
             }
         }
@@ -79,17 +97,19 @@ fun CatlistScreen(navController: NavController, darkModeViewModel: DarkModeViewM
         )
     }
 }
+
 @Composable
 fun CatCard(
     navController: NavController? = null,
-    catItem: CatItem? = null
+    catItem: CatItem? = null,
+    profile: PetProfile? = null // 프로필을 받을 수 있도록 인자를 추가
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(Color.White)
-            .clickable { navController?.navigate("catDetails/${catItem?.name}") },
+            .clickable { navController?.navigate("catDetails/${catItem?.name ?: profile?.name}") },
         elevation = CardDefaults.elevatedCardElevation(4.dp)
     ) {
         Column(
@@ -97,38 +117,60 @@ fun CatCard(
                 .background(Color.White)
                 .padding(16.dp)
         ) {
-            catItem?.picture1?.let {
-                val imageBitmap = decodeBase64ToImageBitmap(it)
-                Image(bitmap = imageBitmap, contentDescription = "Cat Image")
+            when {
+                catItem?.picture1 != null -> {
+                    val imageBitmap = decodeBase64ToImageBitmap(catItem.picture1)
+                    Image(bitmap = imageBitmap, contentDescription = "Cat Image")
+                }
+                profile?.photoUri != null -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(profile.photoUri),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
+                else -> {
+                    // 기본 이미지를 표시할 경우
+                    Image(
+                        painter = painterResource(id = R.drawable.cat),
+                        contentDescription = "Default Cat Image",
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
             }
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = catItem?.name ?: "",
+                text = catItem?.name ?: profile?.name ?: "",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
+
             Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "5.0 ",
-                    color = Color(0xFFFFD700),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = catItem?.address ?: "",
-                    color = Color.Gray
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
+
             Text(
-                text = catItem?.comment ?: "",
-                color = Color(0xFF6A1B9A)
+                text = catItem?.address ?: profile?.species ?: "",
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = catItem?.comment ?: profile?.age ?: "",
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = profile?.gender ?: "",
+                color = Color.Gray
             )
         }
     }
 }
+
 @Composable
 fun AIChatbotButton(navController: NavController, modifier: Modifier = Modifier) {
     FloatingActionButton(
@@ -141,4 +183,5 @@ fun AIChatbotButton(navController: NavController, modifier: Modifier = Modifier)
         Text(text = "AI 상담", color = Color.White)
     }
 }
+
 

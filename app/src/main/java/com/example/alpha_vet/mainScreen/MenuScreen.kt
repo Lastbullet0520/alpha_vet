@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,18 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.alpha_vet.model.DarkModeViewModel
-import com.example.alpha_vet.R
 import com.example.alpha_vet.model.PetProfileViewModel
+import com.example.alpha_vet.R
 import com.example.alpha_vet.state.Screen
 
 @Composable
 fun MenuScreen(
     navController: NavController,
-    petProfile: PetProfileViewModel,
-    darkModeViewModel: DarkModeViewModel,
-) {  // 새로 추가된 버튼에 사용
+    petProfileViewModel: PetProfileViewModel
+) {
     var isPetProfileVisible by remember { mutableStateOf(false) }
+    val petProfiles by petProfileViewModel.petProfiles.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,8 +76,7 @@ fun MenuScreen(
                     .padding(top = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Display the pet's image if available, else default image
-                petProfile.photoUri?.let {
+                petProfiles.firstOrNull()?.photoUri?.let {
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -101,7 +101,6 @@ fun MenuScreen(
                     )
                 }
 
-                // "프로필 수정" button
                 TextButton(
                     onClick = { navController.navigate("ProfileScreen") },
                     modifier = Modifier.padding(top = 8.dp)
@@ -113,23 +112,24 @@ fun MenuScreen(
                     modifier = Modifier
                         .padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp) // Increase spacing between text elements
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = petProfile.name,
-                        color = Color.White,
-                        fontSize = 16.sp // Set font size to be the same for both texts
-                    )
-                    Text(
-                        text = "${petProfile.species}, ${petProfile.age}, ${petProfile.gender}",
-                        color = Color.White,
-                        fontSize = 16.sp // Set font size to be the same for both texts
-                    )
+                    petProfiles.firstOrNull()?.let { profile ->
+                        Text(
+                            text = profile.name,
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "${profile.species}, ${profile.age}, ${profile.gender}",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
 
             IconButton(
-                // 이부분은 수정이 필요
                 onClick = { navController.navigate(Screen.Home.route) },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -160,8 +160,6 @@ fun MenuScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "쿠폰함", color = Color.Gray)
             }
-
-            // 나의 펫 버튼
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 TextButton(
                     onClick = { isPetProfileVisible = !isPetProfileVisible },
@@ -172,42 +170,44 @@ fun MenuScreen(
             }
         }
 
-
         Divider(thickness = 1.dp, color = Color.LightGray)
-        // "나의 펫 버튼을 클릭했을 때 프로필 정보 표시"
-        // "나의 펫" 버튼을 클릭했을 때 프로필 정보 표시
+
         if (isPetProfileVisible) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                petProfile.photoUri?.let {
-                    Image(
-                        painter = rememberAsyncImagePainter(Uri.parse(it)),
-                        contentDescription = "Pet Profile Image",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                    )
-                } ?: run {
-                    Image(
-                        painter = painterResource(id = R.drawable.dog),
-                        contentDescription = "Default Pet Image",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                    )
+            petProfiles.forEach { profile ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    profile.photoUri?.let {
+                        Image(
+                            painter = rememberAsyncImagePainter(Uri.parse(it)),
+                            contentDescription = "Pet Profile Image",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .background(Color.Gray)
+                        )
+                    } ?: run {
+                        Image(
+                            painter = painterResource(id = R.drawable.dog),
+                            contentDescription = "Default Pet Image",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .background(Color.Gray)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "이름: ${profile.name}", fontSize = 18.sp, color = Color.Black)
+                    Text(text = "종: ${profile.species}", fontSize = 18.sp, color = Color.Black)
+                    Text(text = "나이: ${profile.age}", fontSize = 18.sp, color = Color.Black)
+                    Text(text = "성별: ${profile.gender}", fontSize = 18.sp, color = Color.Black)
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = "이름: ${petProfile.name}", fontSize = 18.sp, color = Color.Black)
-                Text(text = "종: ${petProfile.species}", fontSize = 18.sp, color = Color.Black)
-                Text(text = "나이: ${petProfile.age}", fontSize = 18.sp, color = Color.Black)
-                Text(text = "성별: ${petProfile.gender}", fontSize = 18.sp, color = Color.Black)
             }
         }
 
@@ -230,7 +230,6 @@ fun MenuItem(title: String, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = title, fontSize = 16.sp, color = Color.Black)
-            // 아이콘 제거
         }
         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
     }

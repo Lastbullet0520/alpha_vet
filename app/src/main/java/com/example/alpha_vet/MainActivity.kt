@@ -23,7 +23,6 @@ import com.example.alpha_vet.mainScreen.ProfileScreen
 import com.example.alpha_vet.mainScreen.SetScreen
 import com.example.alpha_vet.model.DarkModeViewModel
 import com.example.alpha_vet.model.PetProfileViewModel
-import com.example.alpha_vet.navigationScreen.HomeScreen
 import com.example.alpha_vet.navigationScreen.ProfileScreen2
 import com.example.alpha_vet.navigationScreen.SearchScreen
 import com.example.alpha_vet.petlistScreen.AichatScreen
@@ -38,32 +37,34 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val darkModeViewModel: DarkModeViewModel = viewModel()
-            MyApp(darkModeViewModel)
+            val petProfileViewModel: PetProfileViewModel = viewModel()
+
+            MyApp(darkModeViewModel, petProfileViewModel)
         }
     }
 }
 
 @Composable
-fun MyApp(darkModeViewModel: DarkModeViewModel) {
-
+fun MyApp(
+    darkModeViewModel: DarkModeViewModel,
+    petProfileViewModel: PetProfileViewModel
+) {
     val isDarkModeEnabled by darkModeViewModel.isDarkMode.collectAsState()
 
     AlphaVetTheme(darkTheme = isDarkModeEnabled) {
-
-        AppContent(darkModeViewModel)
+        AppContent(darkModeViewModel, petProfileViewModel)
     }
 }
 
 @Composable
-fun AppContent(darkModeViewModel: DarkModeViewModel) {
+fun AppContent(
+    darkModeViewModel: DarkModeViewModel,
+    petProfileViewModel: PetProfileViewModel
+) {
     val navController = rememberNavController()
-    val petProfileViewModel: PetProfileViewModel = viewModel()
-
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        // buttomNavigation 추가
-
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
@@ -71,25 +72,21 @@ fun AppContent(darkModeViewModel: DarkModeViewModel) {
                 navController = navController,
                 startDestination = "entryScreen"
             ) {
-                //buttomNavigation 화면전환 추가
-                composable(Screen.Home.route) { MainScreen(navController, darkModeViewModel) }
+                composable(Screen.Home.route) { MainScreen(navController, darkModeViewModel, petProfileViewModel) }
                 composable(Screen.Search.route) { SearchScreen() }
                 composable(Screen.Profile.route) { ProfileScreen2() }
                 composable("entryScreen") { EntryScreen(navController) }
                 composable("doglistScreen") { DoglistScreen(navController, darkModeViewModel, petProfileViewModel) }
-                composable("catlistScreen") { CatlistScreen(navController, darkModeViewModel) }
+                composable("catlistScreen") { CatlistScreen(navController, darkModeViewModel, petProfileViewModel) }
                 composable("menuScreen") {
-                    MenuScreen(navController, petProfileViewModel, darkModeViewModel)
+                    MenuScreen(navController, petProfileViewModel)
                 }
                 composable("setScreen") { SetScreen(navController, darkModeViewModel) }
                 composable("aichatScreen") { AichatScreen(navController, darkModeViewModel) }
                 composable("profileScreen") {
-                    ProfileScreen(navController, petProfileViewModel, darkModeViewModel)
+                    ProfileScreen(navController, petProfileViewModel)
                 }
-
             }
         }
     }
 }
-
-

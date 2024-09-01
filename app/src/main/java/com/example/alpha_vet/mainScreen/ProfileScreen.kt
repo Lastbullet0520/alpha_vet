@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button // material3 사용
-import androidx.compose.material3.MaterialTheme // material3 사용
-import androidx.compose.material3.OutlinedTextField // material3 사용
-import androidx.compose.material3.Text // material3 사용
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,29 +34,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.alpha_vet.model.DarkModeViewModel
 import com.example.alpha_vet.model.PetProfileViewModel
-
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    petProfileViewModel: PetProfileViewModel,
-    darkModeViewModel: DarkModeViewModel,
+    petProfileViewModel: PetProfileViewModel
 ) {
-    var species by remember { mutableStateOf(TextFieldValue(petProfileViewModel.species)) }
-    var name by remember { mutableStateOf(TextFieldValue(petProfileViewModel.name)) }
-    var age by remember { mutableStateOf(TextFieldValue(petProfileViewModel.age)) }
-    var gender by remember { mutableStateOf(TextFieldValue(petProfileViewModel.gender)) }
-    var selectedImageUri by remember {
-        mutableStateOf<Uri?>(petProfileViewModel.photoUri?.let {
-            Uri.parse(
-                it
-            )
-        })
-    }
-
-
+    var species by remember { mutableStateOf(TextFieldValue("")) }
+    var name by remember { mutableStateOf(TextFieldValue("")) }
+    var age by remember { mutableStateOf(TextFieldValue("")) }
+    var gender by remember { mutableStateOf(TextFieldValue("")) }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val context = LocalContext.current
 
@@ -139,13 +128,13 @@ fun ProfileScreen(
 
         Button(
             onClick = {
-                petProfileViewModel.species = species.text
-                petProfileViewModel.name = name.text
-                petProfileViewModel.age = age.text
-                petProfileViewModel.gender = gender.text
-                petProfileViewModel.photoUri = selectedImageUri?.toString()
-
-                // Navigate back to MenuScreen
+                petProfileViewModel.addProfile(
+                    species = species.text,
+                    name = name.text,
+                    age = age.text,
+                    gender = gender.text,
+                    photoUri = selectedImageUri?.toString()
+                )
                 navController.popBackStack()
             },
             modifier = Modifier.fillMaxWidth()

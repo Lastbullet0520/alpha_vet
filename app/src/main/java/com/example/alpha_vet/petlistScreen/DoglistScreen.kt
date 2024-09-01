@@ -1,5 +1,6 @@
 package com.example.alpha_vet.petlistScreen
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
@@ -19,11 +20,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,7 +36,9 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.alpha_vet.model.DarkModeViewModel
 import com.example.alpha_vet.MyApp
+import com.example.alpha_vet.R
 import com.example.alpha_vet.model.DogItem
+import com.example.alpha_vet.model.PetProfile
 import com.example.alpha_vet.model.PetProfileViewModel
 
 
@@ -47,9 +53,12 @@ fun DoglistScreen(
     navController: NavController,
     darkModeViewModel: DarkModeViewModel,
     petProfileViewModel: PetProfileViewModel,
-    dogItems: List<DogItem> = emptyList(),
+    dogItems: List<DogItem> = emptyList()
 ) {
-    MyApp(darkModeViewModel = darkModeViewModel)
+    MyApp(darkModeViewModel = darkModeViewModel, petProfileViewModel)
+
+    val petProfiles by petProfileViewModel.petProfiles.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -70,104 +79,145 @@ fun DoglistScreen(
                     .padding(vertical = 16.dp)
             )
 
-            // 리스트 뷰
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)  // Remaining space for LazyColumn
+                    .weight(1f)
             ) {
                 val cardCount = if (dogItems.isEmpty()) 6 else dogItems.size
 
                 items(cardCount) { index ->
                     if (dogItems.isEmpty()) {
-                        EmptyCard()  // 빈 카드
+                        EmptyCard()
                     } else {
-                        DogCard(
-                            navController = navController,
-                            petProfileViewModel,
-                            dogItem = dogItems[index]
-                        )
+                        DogCard(navController = navController, dogItem = dogItems[index])
                     }
                 }
 
+                // 추가된 부분: 저장된 프로필을 리스트에 추가
+                items(petProfiles.size) { index ->
+                    val profile = petProfiles[index]
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .background(Color.White)
+                            .clickable { /* 클릭 이벤트 처리 */ },
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .background(Color.White)
+                                .padding(16.dp)
+                        ) {
+                            profile.photoUri?.let { uri ->
+                                Image(
+                                    painter = rememberAsyncImagePainter(uri),
+                                    contentDescription = "Profile Image",
+                                    modifier = Modifier.size(100.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = profile.name,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = profile.species,
+                                color = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = profile.age,
+                                color = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = profile.gender,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
             }
         }
-        AIChatbotButton(
-            navController = navController,
-            modifier = Modifier.align(Alignment.BottomEnd)
-        )
     }
 }
 
 @Composable
 fun DogCard(
     navController: NavController? = null,
-    petProfileViewModel: PetProfileViewModel,
     dogItem: DogItem? = null,
+    profile: PetProfile? = null // 프로필을 받을 수 있도록 인자를 추가
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(Color.White)
-            .clickable { navController?.navigate("someDestination") },  // Use safe call to avoid null pointer
+            .clickable { navController?.navigate("someDestination") },
         elevation = CardDefaults.elevatedCardElevation(4.dp)
     ) {
         Column(
-
             modifier = Modifier
                 .background(Color.White)
                 .padding(16.dp)
         ) {
-//            dogItem?.picture1?.let {
-//
-//                val imageBitmap = decodeBase64ToImageBitmap(it)
-//
-//                Image(bitmap = imageBitmap, contentDescription = "Dog Image")
-//
-//            }
-            petProfileViewModel.photoUri?.let { uri ->
-                Image(
-                    painter = rememberAsyncImagePainter(uri),
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(16.dp)
-                        .clickable { /* 클릭 이벤트 처리 */ }
-
-                )
+            when {
+                dogItem?.picture1 != null -> {
+                    val imageBitmap = decodeBase64ToImageBitmap(dogItem.picture1)
+                    Image(bitmap = imageBitmap, contentDescription = "Dog Image")
+                }
+                profile?.photoUri != null -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(profile.photoUri),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
+                else -> {
+                    // 기본 이미지를 표시할 경우
+                    Image(
+                        painter = painterResource(id = R.drawable.dog),
+                        contentDescription = "Default Dog Image",
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
             }
-        }
 
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = petProfileViewModel.name ?: "",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             Text(
-                text = "5.0 ",
-                color = Color(0xFFFFD700),
+                text = dogItem?.name ?: profile?.name ?: "",
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             Text(
-                text = dogItem?.address ?: "",
+                text = dogItem?.address ?: profile?.species ?: "",
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = dogItem?.comment ?: profile?.age ?: "",
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = profile?.gender ?: "",
                 color = Color.Gray
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = dogItem?.comment ?: "",
-            color = Color(0xFF6A1B9A)
-        )
     }
 }
-
 
 @Composable
 fun EmptyCard() {

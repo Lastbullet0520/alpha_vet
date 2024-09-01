@@ -43,12 +43,13 @@ import androidx.navigation.NavController
 import com.example.alpha_vet.MyApp
 import com.example.alpha_vet.R
 import com.example.alpha_vet.model.DarkModeViewModel
+import com.example.alpha_vet.model.PetProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 // 상단 "AI가 추천해주는..." , 하단
-fun MainScreen(navController: NavController,darkModeViewModel: DarkModeViewModel) {
-    MyApp(darkModeViewModel)
+fun MainScreen(navController: NavController,darkModeViewModel: DarkModeViewModel, petProfileViewModel: PetProfileViewModel) {
+    MyApp(darkModeViewModel, petProfileViewModel)
     Scaffold(
         topBar = {
             Column {
